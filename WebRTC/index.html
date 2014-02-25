@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Internet Throughput Test</title>
+		<script src="http://www.webrtc-experiment.com/socket.io/PeerConnection.js"></script>
+		<script src="https://www.webrtc-experiment.com/DataChannel.js"> </script>
+		<script src="http://cdn.socket.io/stable/socket.io.js"></script>
+    </head>
+	<body>
+		<div id="download"> 
+			<p>This is for testing file download</p>
+			<a href="http://localhost:8000/getVideo.mp4">Download the file</a>
+		</div>
+		<div id="video"> 
+			<p>This is for testing video</p>
+		</div>
+		<div id="audio"> 
+			<p>This is for testing audio</p>
+		</div>
+		
+		<input type="text" id="chat-input" disabled style="font-size: 2em; width: 98%;"><br />
+		<div id="chat-output"></div>
+		<input type="file" id="file">
+		<div id="file-progress"></div>
+		
+		<script>
+		var chatOutput = document.getElementById('chat-output');
+		var chatInput = document.getElementById('chat-input');
+		chatInput.onkeypress = function(e) {
+        if (e.keyCode != 13) return;
+			channel.send(this.value);
+			chatOutput.innerHTML = 'Me: ' + this.value + '<hr />' + chatOutput.innerHTML;
+			this.value = '';
+		};
+		</script>
+
+		<script>
+		var channel = new DataChannel('Session Unique Identifier');
+
+		channel.onopen = function(userid) {
+			chatInput.disabled = false;
+			chatInput.value = 'Hi, ' + userid;
+			chatInput.focus();
+		};
+
+		channel.onmessage = function(message, userid) {
+			chatOutput.innerHTML = userid + ': ' + message + '<hr />' + chatOutput.innerHTML;
+		};
+
+		channel.onleave = function(userid) {
+			chatOutput.innerHTML = userid + ' Left.<hr />' + chatOutput.innerHTML;
+		};
+		</script>
+	</body>
+</html>
